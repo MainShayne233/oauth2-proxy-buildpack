@@ -8,11 +8,19 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/kr/secureheader"
 )
 
 type Server struct {
 	Handler http.Handler
 	Opts    *Options
+}
+
+func (s *Server) newHTTPServer() *http.Server {
+	wrapper := *secureheader.DefaultConfig
+	wrapper.Next = s.Handler
+	return &http.Server{Handler: &wrapper}
 }
 
 func (s *Server) ListenAndServe() {
@@ -44,7 +52,7 @@ func (s *Server) ServeHTTP() {
 	}
 	log.Printf("HTTP: listening on %s", listenAddr)
 
-	server := &http.Server{Handler: s.Handler}
+	server := s.newHTTPServer()
 	err = server.Serve(listener)
 	if err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
 		log.Printf("ERROR: http.Serve() - %s", err)
@@ -77,7 +85,7 @@ func (s *Server) ServeHTTPS() {
 	log.Printf("HTTPS: listening on %s", ln.Addr())
 
 	tlsListener := tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener)}, config)
-	srv := &http.Server{Handler: s.Handler}
+	srv := s.newHTTPServer()
 	err = srv.Serve(tlsListener)
 
 	if err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
