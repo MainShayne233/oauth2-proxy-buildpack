@@ -14,7 +14,11 @@ import (
 )
 
 func main() {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	if logDateAndTime {
+		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	} else {
+		log.SetFlags(log.Lshortfile)
+	}
 	flagSet := flag.NewFlagSet("oauth2_proxy", flag.ExitOnError)
 
 	emailDomains := StringArray{}
