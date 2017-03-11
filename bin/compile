@@ -17,24 +17,26 @@ if [[ -f "$cache/oa2p/ver" ]]; then
 fi
 
 if [[ $current_ver != $cached_ver ]]; then
-    gb_compile_ver=f4451cc330f67bfbade086668a1e875a233a2993
-    gb_compile_cached_ver=""
-    if [[ -f "$cache/oa2p/gb-compile.ver" ]]; then
-        gb_compile_cached_ver=$(cat "$cache/oa2p/gb-compile.ver")
+    go_bp="$cache/oa2p/go_bp" # heroku golang buildpack will live here
+    go_bp_ver=v62
+    go_bp_cached_ver=""
+    if [[ -f "$cache/oa2p/go_bp.ver" ]]; then
+        go_bp_cached_ver=$(cat "$cache/oa2p/go_bp.ver")
     fi
 
-    if [[ ! "$gb_compile_ver" == "$gb_compile_cached_ver" ]]; then
+    if [[ $go_bp_ver != $go_bp_cached_ver ]]; then
         echo -n "-----> Preparing to build oauth2_proxy ..."
-        curl --show-error -so "$cache/oa2p/gb-compile" \
-             https://raw.githubusercontent.com/paxan/heroku-buildpack-gb/$gb_compile_ver/bin/compile
-        chmod +x "$cache/oa2p/gb-compile"
-        echo "$gb_compile_ver" > "$cache/oa2p/gb-compile.ver"
+        mkdir -p "$go_bp"
+        rm -rf "$go_bp/*"
+        curl --show-error -sL https://api.github.com/repos/heroku/heroku-buildpack-go/tarball/$go_bp_ver \
+        | tar xzf - --strip-components=1 -C "$go_bp"
+        echo "$go_bp_ver" > "$cache/oa2p/go_bp.ver"
         echo " done"
     fi
 
     echo "-----> Building oauth2_proxy ..."
-    # build oauth2_proxy using gb
-    "$cache/oa2p/gb-compile" "$gb_project_dir" "$cache/oa2p" "$env_dir"
+    # build oauth2_proxy using heroku go buildpack
+    "$go_bp/bin/compile" "$gb_project_dir" "$cache/oa2p/go_bp_cache" "$env_dir"
     cp "$gb_project_dir/bin/oauth2_proxy" "$cache/oa2p/"
     echo "$current_ver" > "$cache/oa2p/ver"
 fi
