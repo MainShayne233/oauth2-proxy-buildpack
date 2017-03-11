@@ -79,6 +79,8 @@ func main() {
 
 	flagSet.String("signature-key", "", "GAP-Signature request signature key (algorithm:secretkey)")
 
+	flagSet.Bool("header-safety", false, "add some HTTP header fields widely considered to improve safety of HTTP requests")
+
 	flagSet.Parse(os.Args[1:])
 
 	if *showVersion {

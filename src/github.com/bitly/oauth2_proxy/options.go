@@ -70,6 +70,8 @@ type Options struct {
 
 	SignatureKey string `flag:"signature-key" cfg:"signature_key" env:"OAUTH2_PROXY_SIGNATURE_KEY"`
 
+	HeaderSafety bool `flag:"header-safety" cfg:"header_safety"`
+
 	// internal values that are set after config validation
 	redirectURL   *url.URL
 	proxyURLs     []*url.URL

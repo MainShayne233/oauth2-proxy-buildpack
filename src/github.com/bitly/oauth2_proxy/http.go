@@ -18,9 +18,12 @@ type Server struct {
 }
 
 func (s *Server) newHTTPServer() *http.Server {
-	wrapper := *secureheader.DefaultConfig
-	wrapper.Next = s.Handler
-	return &http.Server{Handler: &wrapper}
+	if s.Opts.HeaderSafety {
+		wrapper := *secureheader.DefaultConfig
+		wrapper.Next = s.Handler
+		return &http.Server{Handler: &wrapper}
+	}
+	return &http.Server{Handler: s.Handler}
 }
 
 func (s *Server) ListenAndServe() {
