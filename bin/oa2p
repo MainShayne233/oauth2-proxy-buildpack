@@ -90,4 +90,5 @@ exec oauth2_proxy \
      -upstream=$upstream_url \
      -client-id=$OA2P_GOOGLE_CLIENT_ID \
      -client-secret=$OA2P_GOOGLE_CLIENT_SECRET \
-     -request-logging=false
+     -request-logging=false \
+     -header-safety=true
