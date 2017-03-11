@@ -36,7 +36,7 @@ if [[ $current_ver != $cached_ver ]]; then
 
     echo "-----> Building oauth2_proxy ..."
     # build oauth2_proxy using heroku go buildpack
-    "$go_bp/bin/compile" "$gb_project_dir" "$cache/oa2p/go_bp_cache" "$env_dir"
+    GOVERSION=go1.8 "$go_bp/bin/compile" "$gb_project_dir" "$cache/oa2p/go_bp_cache" "$env_dir"
     cp "$gb_project_dir/bin/oauth2_proxy" "$cache/oa2p/"
     echo "$current_ver" > "$cache/oa2p/ver"
 fi
